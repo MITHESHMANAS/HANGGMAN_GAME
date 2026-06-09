@@ -78,7 +78,7 @@ Create a `.env` file in the `backend` folder:
 ```env
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=V@rshith09
+DB_PASSWORD=mithesh
 DB_NAME=hangman_game
 ```
 
