@@ -1,0 +1,25 @@
+# Python
+*.py[cod]
+__pycache__/
+*.pyo
+*.pyd
+.env
+venv/
+ENV/
+env/
+.Python
+
+# VS Code
+.vscode/
+
+# Database
+*.db
+
+# Mac
+.DS_Store
+
+# Logs
+*.log
+
+# OS generated
+Thumbs.db

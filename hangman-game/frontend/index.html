@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hangman Game</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #333; min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; }
+        header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
+        h1 { margin-bottom: 10px; }
+        .tabs { display: flex; background: #34495e; }
+        .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; transition: background 0.3s; }
+        .tab.active { background: #1abc9c; font-weight: bold; }
+        .tab:hover:not(.active) { background: #3d566e; }
+        .tab-content { display: none; padding: 20px; }
+        .tab-content.active { display: block; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; }
+        button { background: #1abc9c; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; transition: background 0.3s; margin: 5px; }
+        button:hover { background: #16a085; }
+        button:disabled { background: #95a5a6; cursor: not-allowed; }
+        .game-area { text-align: center; margin: 20px 0; }
+        .word-display { font-size: 32px; letter-spacing: 10px; margin: 20px 0; font-weight: bold; min-height: 50px; }
+        .hangman-container { margin: 20px auto; width: 200px; height: 200px; position: relative; }
+        .hangman-part { background: #333; position: absolute; display: none; }
+        .gallows { height: 10px; width: 150px; top: 0; left: 25px; background: #8B4513; display: block; }
+        .pole { height: 200px; width: 10px; top: 0; left: 25px; background: #8B4513; display: block; }
+        .base { height: 10px; width: 100px; top: 190px; left: 0; background: #8B4513; display: block; }
+        .head { height: 40px; width: 40px; border-radius: 50%; top: 40px; left: 135px; }
+        .body { height: 60px; width: 10px; top: 80px; left: 150px; }
+        .left-arm { height: 10px; width: 40px; top: 90px; left: 110px; transform: rotate(45deg); }
+        .right-arm { height: 10px; width: 40px; top: 90px; left: 150px; transform: rotate(-45deg); }
+        .left-leg { height: 10px; width: 40px; top: 140px; left: 110px; transform: rotate(45deg); }
+        .right-leg { height: 10px; width: 40px; top: 140px; left: 150px; transform: rotate(-45deg); }
+        .game-info { margin: 20px 0; font-size: 18px; }
+        .letter-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin: 20px 0; }
+        .letter-btn { width: 40px; height: 40px; font-size: 18px; font-weight: bold; }
+        .message { padding: 10px; margin: 10px 0; border-radius: 4px; text-align: center; font-weight: bold; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .leaderboard-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .leaderboard-table th, .leaderboard-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        .leaderboard-table th { background: #f2f2f2; font-weight: bold; }
+        .leaderboard-table tr:hover { background: #f5f5f5; }
+        .player-stats { background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .player-stats p { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Hangman Game</h1>
+            <p>Guess the word before the man gets hanged!</p>
+        </header>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="login">Login</div>
+            <div class="tab" data-tab="register">Register</div>
+            <div class="tab" data-tab="game">Game</div>
+            <div class="tab" data-tab="leaderboard">Leaderboard</div>
+        </div>
+        
+        <div class="tab-content active" id="login-tab">
+            <h2>Login to Play</h2>
+            <div class="form-group">
+                <label for="login-username">Username</label>
+                <input type="text" id="login-username" placeholder="Enter your username">
+            </div>
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" placeholder="Enter your password">
+            </div>
+            <button id="login-btn">Login</button>
+            <div id="login-message" class="message"></div>
+        </div>
+        
+        <div class="tab-content" id="register-tab">
+            <h2>Create New Account</h2>
+            <div class="form-group">
+                <label for="register-username">Username</label>
+                <input type="text" id="register-username" placeholder="Choose a username">
+            </div>
+            <div class="form-group">
+                <label for="register-email">Email</label>
+                <input type="email" id="register-email" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="register-password">Password</label>
+                <input type="password" id="register-password" placeholder="Choose a password">
+            </div>
+            <button id="register-btn">Register</button>
+            <div id="register-message" class="message"></div>
+        </div>
+        
+        <div class="tab-content" id="game-tab">
+            <div id="player-stats" class="player-stats" style="display: none;">
+                <h3>Player Stats</h3>
+                <p>Username: <span id="stats-username"></span></p>
+                <p>Games Played: <span id="stats-games-played"></span></p>
+                <p>Games Won: <span id="stats-games-won"></span></p>
+                <p>Coins: <span id="stats-coins"></span></p>
+            </div>
+            
+            <div class="game-area">
+                <div class="hangman-container">
+                    <div class="hangman-part gallows"></div>
+                    <div class="hangman-part pole"></div>
+                    <div class="hangman-part base"></div>
+                    <div class="hangman-part head"></div>
+                    <div class="hangman-part body"></div>
+                    <div class="hangman-part left-arm"></div>
+                    <div class="hangman-part right-arm"></div>
+                    <div class="hangman-part left-leg"></div>
+                    <div class="hangman-part right-leg"></div>
+                </div>
+                
+                <div class="word-display" id="word-display"></div>
+                
+                <div class="game-info">
+                    <p>Hint: <span id="hint-text"></span></p>
+                    <p>Remaining Lives: <span id="remaining-lives">6</span></p>
+                </div>
+                
+                <div class="letter-buttons" id="letter-buttons"></div>
+                
+                <button id="hint-btn" disabled>Get Hint (Cost: 10 coins)</button>
+                <button id="new-game-btn" disabled>New Game</button>
+                
+                <div id="game-message" class="message"></div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="leaderboard-tab">
+            <h2>Top Players</h2>
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Username</th>
+                        <th>Games Played</th>
+                        <th>Games Won</th>
+                        <th>Coins</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body"></tbody>
+            </table>
+            <button id="refresh-leaderboard">Refresh</button>
+        </div>
+    </div>
+
+    <script>
+        let currentPlayer = null;
+        let currentGame = null;
+        let alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const API_BASE = 'http://localhost:5000/api';
+        
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                tabContents.forEach(content => content.classList.remove('active'));
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+                if (tabId === 'leaderboard') loadLeaderboard();
+            });
+        });
+        
+        document.getElementById('login-btn').addEventListener('click', async () => {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            const messageEl = document.getElementById('login-message');
+            
+            try {
+                const response = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentPlayer = data.user;
+                    showMessage(messageEl, 'Login successful!', 'success');
+                    document.querySelector('.tab[data-tab="game"]').click();
+                    updatePlayerStats();
+                    document.getElementById('new-game-btn').disabled = false;
+                } else {
+                    showMessage(messageEl, data.error, 'error');
+                }
+            } catch (error) {
+                showMessage(messageEl, 'Login failed. Please try again.', 'error');
+            }
+        });
+        
+        document.getElementById('register-btn').addEventListener('click', async () => {
+            const username = document.getElementById('register-username').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const messageEl = document.getElementById('register-message');
+            
+            try {
+                const response = await fetch(`${API_BASE}/register`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ username, email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage(messageEl, 'Registration successful! Please login.', 'success');
+                    document.getElementById('register-username').value = '';
+                    document.getElementById('register-email').value = '';
+                    document.getElementById('register-password').value = '';
+                    document.querySelector('.tab[data-tab="login"]').click();
+                } else {
+                    showMessage(messageEl, data.error, 'error');
+                }
+            } catch (error) {
+                showMessage(messageEl, 'Registration failed. Please try again.', 'error');
+            }
+        });
+        
+        document.getElementById('new-game-btn').addEventListener('click', async () => {
+            if (!currentPlayer) {
+                showGameMessage('Please login first', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/start-game`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ player_id: currentPlayer.player_id })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentGame = {
+                        game_id: data.game_id,
+                        mask: data.mask,
+                        hint: data.hint,
+                        remaining_lives: data.remaining_lives
+                    };
+                    
+                    document.getElementById('word-display').textContent = data.mask.split('').join(' ');
+                    document.getElementById('hint-text').textContent = data.hint;
+                    document.getElementById('remaining-lives').textContent = data.remaining_lives;
+                    
+                    resetHangman();
+                    generateLetterButtons();
+                    document.getElementById('hint-btn').disabled = currentPlayer.wallet_balance < 10;
+                    showGameMessage('New game started! Guess a letter.', 'info');
+                } else {
+                    showGameMessage(data.error, 'error');
+                }
+            } catch (error) {
+                showGameMessage('Failed to start game. Please try again.', 'error');
+            }
+        });
+        
+        document.getElementById('hint-btn').addEventListener('click', async () => {
+            if (!currentPlayer || !currentGame) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/get-hint`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        game_id: currentGame.game_id,
+                        player_id: currentPlayer.player_id
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentGame.mask = data.new_mask;
+                    document.getElementById('word-display').textContent = data.new_mask.split('').join(' ');
+                    await updatePlayerStats();
+                    document.getElementById('hint-btn').disabled = currentPlayer.wallet_balance < 10;
+                    showGameMessage(`Hint used! Letter "${data.revealed_letter}" revealed.`, 'success');
+                } else {
+                    showGameMessage(data.error, 'error');
+                }
+            } catch (error) {
+                showGameMessage('Failed to get hint. Please try again.', 'error');
+            }
+        });
+        
+        document.getElementById('refresh-leaderboard').addEventListener('click', loadLeaderboard);
+        
+        function showMessage(element, message, type) {
+            element.textContent = message;
+            element.className = `message ${type}`;
+            element.style.display = 'block';
+        }
+        
+        function showGameMessage(message, type) {
+            showMessage(document.getElementById('game-message'), message, type);
+        }
+        
+        function updatePlayerStats() {
+            if (currentPlayer) {
+                document.getElementById('player-stats').style.display = 'block';
+                document.getElementById('stats-username').textContent = currentPlayer.username;
+                document.getElementById('stats-games-played').textContent = currentPlayer.games_played;
+                document.getElementById('stats-games-won').textContent = currentPlayer.games_won;
+                document.getElementById('stats-coins').textContent = currentPlayer.wallet_balance;
+            }
+        }
+        
+        function generateLetterButtons() {
+            const container = document.getElementById('letter-buttons');
+            container.innerHTML = '';
+            
+            for (let letter of alphabet) {
+                const button = document.createElement('button');
+                button.className = 'letter-btn';
+                button.textContent = letter;
+                button.addEventListener('click', () => makeGuess(letter));
+                container.appendChild(button);
+            }
+        }
+        
+        async function makeGuess(letter) {
+            if (!currentGame) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/make-guess`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        game_id: currentGame.game_id,
+                        letter: letter
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentGame.mask = data.new_mask;
+                    currentGame.remaining_lives = data.remaining_lives;
+                    
+                    document.getElementById('word-display').textContent = data.new_mask.split('').join(' ');
+                    document.getElementById('remaining-lives').textContent = data.remaining_lives;
+                    
+                    const buttons = document.querySelectorAll('.letter-btn');
+                    buttons.forEach(btn => {
+                        if (btn.textContent === letter) {
+                            btn.disabled = true;
+                            btn.style.background = data.is_correct ? '#2ecc71' : '#e74c3c';
+                        }
+                    });
+                    
+                    if (!data.is_correct) {
+                        updateHangman(6 - data.remaining_lives);
+                    }
+                    
+                    if (data.game_won) {
+                        showGameMessage('Congratulations! You won! +20 coins', 'success');
+                        disableAllLetterButtons();
+                        document.getElementById('hint-btn').disabled = true;
+                        await updatePlayerStats();
+                    } else if (data.game_lost) {
+                        showGameMessage('Game over! You lost.', 'error');
+                        disableAllLetterButtons();
+                        document.getElementById('hint-btn').disabled = true;
+                        await updatePlayerStats();
+                    } else {
+                        showGameMessage(data.is_correct ? 'Correct guess!' : 'Incorrect guess!', 
+                                       data.is_correct ? 'success' : 'error');
+                    }
+                } else {
+                    showGameMessage(data.error, 'error');
+                }
+            } catch (error) {
+                showGameMessage('Failed to make guess. Please try again.', 'error');
+            }
+        }
+        
+        function disableAllLetterButtons() {
+            const buttons = document.querySelectorAll('.letter-btn');
+            buttons.forEach(btn => btn.disabled = true);
+        }
+        
+        function resetHangman() {
+            const parts = document.querySelectorAll('.hangman-part');
+            parts.forEach(part => {
+                if (part.classList.contains('gallows') || 
+                    part.classList.contains('pole') || 
+                    part.classList.contains('base')) {
+                    part.style.display = 'block';
+                } else {
+                    part.style.display = 'none';
+                }
+            });
+        }
+        
+        function updateHangman(wrongGuesses) {
+            const parts = ['head', 'body', 'left-arm', 'right-arm', 'left-leg', 'right-leg'];
+            for (let i = 0; i < wrongGuesses; i++) {
+                if (i < parts.length) {
+                    document.querySelector(`.${parts[i]}`).style.display = 'block';
+                }
+            }
+        }
+        
+        async function loadLeaderboard() {
+            try {
+                const response = await fetch(`${API_BASE}/leaderboard`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const tbody = document.getElementById('leaderboard-body');
+                    tbody.innerHTML = '';
+                    
+                    data.leaderboard.forEach((player, index) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${index + 1}</td>
+                            <td>${player.username}</td>
+                            <td>${player.games_played}</td>
+                            <td>${player.games_won}</td>
+                            <td>${player.wallet_balance}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                console.error('Leaderboard loading error:', error);
+            }
+        }
+        
+        generateLetterButtons();
+        loadLeaderboard();
+    </script>
+</body>
+</html>
