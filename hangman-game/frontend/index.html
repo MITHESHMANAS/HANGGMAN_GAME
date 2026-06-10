@@ -1,448 +1,433 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hangman Game</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #333; min-height: 100vh; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; }
-        header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
-        h1 { margin-bottom: 10px; }
-        .tabs { display: flex; background: #34495e; }
-        .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; transition: background 0.3s; }
-        .tab.active { background: #1abc9c; font-weight: bold; }
-        .tab:hover:not(.active) { background: #3d566e; }
-        .tab-content { display: none; padding: 20px; }
-        .tab-content.active { display: block; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; }
-        button { background: #1abc9c; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; transition: background 0.3s; margin: 5px; }
-        button:hover { background: #16a085; }
-        button:disabled { background: #95a5a6; cursor: not-allowed; }
-        .game-area { text-align: center; margin: 20px 0; }
-        .word-display { font-size: 32px; letter-spacing: 10px; margin: 20px 0; font-weight: bold; min-height: 50px; }
-        .hangman-container { margin: 20px auto; width: 200px; height: 200px; position: relative; }
-        .hangman-part { background: #333; position: absolute; display: none; }
-        .gallows { height: 10px; width: 150px; top: 0; left: 25px; background: #8B4513; display: block; }
-        .pole { height: 200px; width: 10px; top: 0; left: 25px; background: #8B4513; display: block; }
-        .base { height: 10px; width: 100px; top: 190px; left: 0; background: #8B4513; display: block; }
-        .head { height: 40px; width: 40px; border-radius: 50%; top: 40px; left: 135px; }
-        .body { height: 60px; width: 10px; top: 80px; left: 150px; }
-        .left-arm { height: 10px; width: 40px; top: 90px; left: 110px; transform: rotate(45deg); }
-        .right-arm { height: 10px; width: 40px; top: 90px; left: 150px; transform: rotate(-45deg); }
-        .left-leg { height: 10px; width: 40px; top: 140px; left: 110px; transform: rotate(45deg); }
-        .right-leg { height: 10px; width: 40px; top: 140px; left: 150px; transform: rotate(-45deg); }
-        .game-info { margin: 20px 0; font-size: 18px; }
-        .letter-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin: 20px 0; }
-        .letter-btn { width: 40px; height: 40px; font-size: 18px; font-weight: bold; }
-        .message { padding: 10px; margin: 10px 0; border-radius: 4px; text-align: center; font-weight: bold; }
-        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
-        .leaderboard-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .leaderboard-table th, .leaderboard-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
-        .leaderboard-table th { background: #f2f2f2; font-weight: bold; }
-        .leaderboard-table tr:hover { background: #f5f5f5; }
-        .player-stats { background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
-        .player-stats p { margin: 5px 0; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hangman — Premium Edition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --ink:#1a1a2e;--ink2:#2d2d44;--ink3:#6b6b8a;
+    --cream:#fdfcf7;--parchment:#f5f0e8;--gold:#c9a84c;--gold2:#e8c97a;
+    --rose:#c0606a;--mist:#e8e4f0;
+    --border:rgba(201,168,76,0.25);--border2:rgba(201,168,76,0.5);
+  }
+  body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh}
+
+  .hero{background:var(--ink);padding:48px 40px 40px;text-align:center;position:relative;overflow:hidden}
+  .hero::before{
+    content:'';position:absolute;inset:0;
+    background:repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(201,168,76,0.06) 39px,rgba(201,168,76,0.06) 40px),
+               repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(201,168,76,0.06) 39px,rgba(201,168,76,0.06) 40px);
+  }
+  .hero-inner{position:relative;z-index:1}
+  .hero-eyebrow{font-size:11px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--gold2);margin-bottom:16px;opacity:0.8}
+  .hero h1{font-family:'Playfair Display',serif;font-size:52px;font-weight:700;color:#fff;line-height:1.1;margin-bottom:12px}
+  .hero-sub{font-size:14px;font-weight:300;color:rgba(255,255,255,0.45);letter-spacing:1px}
+  .gold-rule{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:20px auto 0}
+
+  .nav{background:var(--ink2);display:flex;border-bottom:1px solid rgba(201,168,76,0.15);padding:0 40px}
+  .nav-tab{padding:16px 24px;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.2s,border-color 0.2s}
+  .nav-tab:hover{color:rgba(255,255,255,0.7)}
+  .nav-tab.active{color:var(--gold2);border-bottom-color:var(--gold)}
+
+  .panel{display:none;padding:48px 40px}
+  .panel.active{display:block}
+
+  .panel-title{font-family:'Playfair Display',serif;font-size:30px;font-weight:500;color:var(--ink);margin-bottom:8px}
+  .panel-sub{font-size:14px;color:var(--ink3);margin-bottom:36px;font-weight:300}
+  .form-grid{display:grid;gap:20px;max-width:420px}
+  .field label{display:block;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px}
+  .field input{width:100%;padding:14px 16px;border:1px solid var(--border2);border-radius:4px;font-size:14px;font-family:'Inter',sans-serif;background:var(--parchment);color:var(--ink);outline:none;transition:border-color 0.2s,background 0.2s}
+  .field input:focus{border-color:var(--gold);background:#fff}
+
+  .btn-primary{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border:none;border-radius:4px;background:var(--ink);color:var(--gold2);font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:background 0.2s,transform 0.15s}
+  .btn-primary:hover{background:var(--ink2);transform:translateY(-1px)}
+  .btn-primary:active{transform:translateY(0)}
+  .btn-primary:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+
+  .toast{display:none;padding:12px 16px;border-radius:4px;font-size:13px;font-weight:500;margin-top:16px;max-width:420px}
+  .toast.success{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7}
+  .toast.error{background:#fce4ec;color:#c62828;border:1px solid #f48fb1}
+  .toast.info{background:var(--mist);color:var(--ink2);border:1px solid var(--border2)}
+  .toast.show{display:block}
+
+  .game-layout{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+  @media(max-width:700px){.game-layout{grid-template-columns:1fr}}
+
+  .player-card{background:var(--parchment);border:1px solid var(--border);border-radius:8px;padding:24px;margin-bottom:32px;display:none}
+  .player-card.visible{display:block}
+  .player-card-title{font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--ink3);margin-bottom:16px}
+  .stats-row{display:flex;gap:32px;flex-wrap:wrap}
+  .stat-val{font-size:26px;font-weight:600;color:var(--ink);font-family:'Playfair Display',serif}
+  .stat-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-top:2px}
+
+  .gallows-wrap{display:flex;justify-content:center;margin-bottom:16px}
+
+  .word-display{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:20px 0;min-height:56px;align-items:flex-end}
+  .letter-slot{width:34px;border-bottom:2px solid var(--gold);text-align:center;font-size:22px;font-weight:600;font-family:'Playfair Display',serif;color:var(--ink);padding-bottom:4px;min-height:36px;line-height:36px}
+  .letter-space{width:16px}
+
+  .hint-bar{background:var(--parchment);border:1px solid var(--border);border-radius:4px;padding:12px 16px;font-size:13px;color:var(--ink3);margin-bottom:16px;display:none;gap:8px;align-items:center}
+  .hint-bar.visible{display:flex}
+  .hint-bar span{font-style:italic}
+
+  .lives-row{display:flex;align-items:center;gap:8px;margin-bottom:24px}
+  .lives-label{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-right:4px}
+
+  .action-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+  .btn-outline{padding:11px 22px;border:1px solid var(--border2);border-radius:4px;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;background:transparent;color:var(--ink3);cursor:pointer;transition:all 0.2s}
+  .btn-outline:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+  .btn-outline:disabled{opacity:0.3;cursor:not-allowed}
+
+  .keyboard{display:grid;grid-template-columns:repeat(9,1fr);gap:5px}
+  .key-btn{aspect-ratio:1;border:1px solid var(--border2);border-radius:4px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;background:var(--parchment);color:var(--ink);cursor:pointer;transition:all 0.15s}
+  .key-btn:hover:not(:disabled){background:var(--ink);color:var(--gold2);border-color:var(--ink)}
+  .key-btn:disabled{cursor:not-allowed}
+  .key-btn.correct{background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7;opacity:1}
+  .key-btn.wrong{background:var(--mist);color:var(--ink3);border-color:var(--border);opacity:0.5}
+
+  .kb-label{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+
+  .lb-table{width:100%;border-collapse:collapse;margin-top:24px}
+  .lb-table th{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);font-weight:600;padding:0 16px 12px 0;border-bottom:1px solid var(--border2);text-align:left}
+  .lb-table td{padding:16px 16px 16px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--ink)}
+  .lb-table tr:last-child td{border-bottom:none}
+  .rank{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;font-family:'Playfair Display',serif;background:var(--parchment);color:var(--ink3);border:1px solid var(--border)}
+  .rank.gold-rank{background:var(--gold);color:#fff;border-color:var(--gold)}
+  .rank.silver-rank{background:#b0b0b0;color:#fff;border-color:#b0b0b0}
+  .rank.bronze-rank{background:#cd7f32;color:#fff;border-color:#cd7f32}
+  .coins-cell{font-family:'Playfair Display',serif;color:var(--gold)}
+
+  .divider{display:flex;align-items:center;gap:16px;margin:32px 0}
+  .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border2)}
+  .divider-text{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink3)}
+</style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Hangman Game</h1>
-            <p>Guess the word before the man gets hanged!</p>
-        </header>
-        
-        <div class="tabs">
-            <div class="tab active" data-tab="login">Login</div>
-            <div class="tab" data-tab="register">Register</div>
-            <div class="tab" data-tab="game">Game</div>
-            <div class="tab" data-tab="leaderboard">Leaderboard</div>
-        </div>
-        
-        <div class="tab-content active" id="login-tab">
-            <h2>Login to Play</h2>
-            <div class="form-group">
-                <label for="login-username">Username</label>
-                <input type="text" id="login-username" placeholder="Enter your username">
-            </div>
-            <div class="form-group">
-                <label for="login-password">Password</label>
-                <input type="password" id="login-password" placeholder="Enter your password">
-            </div>
-            <button id="login-btn">Login</button>
-            <div id="login-message" class="message"></div>
-        </div>
-        
-        <div class="tab-content" id="register-tab">
-            <h2>Create New Account</h2>
-            <div class="form-group">
-                <label for="register-username">Username</label>
-                <input type="text" id="register-username" placeholder="Choose a username">
-            </div>
-            <div class="form-group">
-                <label for="register-email">Email</label>
-                <input type="email" id="register-email" placeholder="Enter your email">
-            </div>
-            <div class="form-group">
-                <label for="register-password">Password</label>
-                <input type="password" id="register-password" placeholder="Choose a password">
-            </div>
-            <button id="register-btn">Register</button>
-            <div id="register-message" class="message"></div>
-        </div>
-        
-        <div class="tab-content" id="game-tab">
-            <div id="player-stats" class="player-stats" style="display: none;">
-                <h3>Player Stats</h3>
-                <p>Username: <span id="stats-username"></span></p>
-                <p>Games Played: <span id="stats-games-played"></span></p>
-                <p>Games Won: <span id="stats-games-won"></span></p>
-                <p>Coins: <span id="stats-coins"></span></p>
-            </div>
-            
-            <div class="game-area">
-                <div class="hangman-container">
-                    <div class="hangman-part gallows"></div>
-                    <div class="hangman-part pole"></div>
-                    <div class="hangman-part base"></div>
-                    <div class="hangman-part head"></div>
-                    <div class="hangman-part body"></div>
-                    <div class="hangman-part left-arm"></div>
-                    <div class="hangman-part right-arm"></div>
-                    <div class="hangman-part left-leg"></div>
-                    <div class="hangman-part right-leg"></div>
-                </div>
-                
-                <div class="word-display" id="word-display"></div>
-                
-                <div class="game-info">
-                    <p>Hint: <span id="hint-text"></span></p>
-                    <p>Remaining Lives: <span id="remaining-lives">6</span></p>
-                </div>
-                
-                <div class="letter-buttons" id="letter-buttons"></div>
-                
-                <button id="hint-btn" disabled>Get Hint (Cost: 10 coins)</button>
-                <button id="new-game-btn" disabled>New Game</button>
-                
-                <div id="game-message" class="message"></div>
-            </div>
-        </div>
-        
-        <div class="tab-content" id="leaderboard-tab">
-            <h2>Top Players</h2>
-            <table class="leaderboard-table">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Username</th>
-                        <th>Games Played</th>
-                        <th>Games Won</th>
-                        <th>Coins</th>
-                    </tr>
-                </thead>
-                <tbody id="leaderboard-body"></tbody>
-            </table>
-            <button id="refresh-leaderboard">Refresh</button>
-        </div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">A Classic Word Game</p>
+    <h1>Hangman</h1>
+    <p class="hero-sub">Guess wisely. Every letter counts.</p>
+    <div class="gold-rule"></div>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="nav-tab active" data-tab="login">Sign In</button>
+  <button class="nav-tab" data-tab="register">Register</button>
+  <button class="nav-tab" data-tab="game">Play</button>
+  <button class="nav-tab" data-tab="leaderboard">Leaderboard</button>
+</div>
+
+<!-- LOGIN -->
+<div class="panel active" id="login-panel">
+  <p class="panel-title">Welcome back</p>
+  <p class="panel-sub">Sign in to track your progress and compete on the leaderboard.</p>
+  <div class="form-grid">
+    <div class="field"><label>Username</label><input id="login-username" type="text" placeholder="Your username"></div>
+    <div class="field"><label>Password</label><input id="login-password" type="password" placeholder="••••••••"></div>
+    <div><button class="btn-primary" id="login-btn">Sign In →</button></div>
+  </div>
+  <div class="toast" id="login-msg"></div>
+</div>
+
+<!-- REGISTER -->
+<div class="panel" id="register-panel">
+  <p class="panel-title">Create an account</p>
+  <p class="panel-sub">Join thousands of players and start earning coins.</p>
+  <div class="form-grid">
+    <div class="field"><label>Username</label><input id="reg-username" type="text" placeholder="Choose a username"></div>
+    <div class="field"><label>Email</label><input id="reg-email" type="email" placeholder="your@email.com"></div>
+    <div class="field"><label>Password</label><input id="reg-password" type="password" placeholder="••••••••"></div>
+    <div><button class="btn-primary" id="register-btn">Create Account →</button></div>
+  </div>
+  <div class="toast" id="register-msg"></div>
+</div>
+
+<!-- GAME -->
+<div class="panel" id="game-panel">
+  <div id="player-card" class="player-card">
+    <p class="player-card-title">Player Profile</p>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-val" id="s-username">—</div><div class="stat-label">Player</div></div>
+      <div class="stat"><div class="stat-val" id="s-played">0</div><div class="stat-label">Played</div></div>
+      <div class="stat"><div class="stat-val" id="s-won">0</div><div class="stat-label">Won</div></div>
+      <div class="stat"><div class="stat-val" id="s-coins" style="color:var(--gold)">0</div><div class="stat-label">Coins</div></div>
+    </div>
+  </div>
+
+  <div class="game-layout">
+    <div>
+      <div class="gallows-wrap">
+        <svg width="200" height="220" viewBox="0 0 200 220">
+          <line x1="20" y1="210" x2="100" y2="210" stroke="#c9a84c" stroke-width="3" stroke-linecap="round"/>
+          <line x1="40" y1="20" x2="40" y2="210" stroke="#c9a84c" stroke-width="3" stroke-linecap="round"/>
+          <line x1="40" y1="20" x2="130" y2="20" stroke="#c9a84c" stroke-width="3" stroke-linecap="round"/>
+          <line x1="130" y1="20" x2="130" y2="45" stroke="#c9a84c" stroke-width="2" stroke-linecap="round" stroke-dasharray="4,3"/>
+          <circle id="hm-head" cx="130" cy="62" r="16" stroke="#1a1a2e" stroke-width="2" fill="none" display="none"/>
+          <line id="hm-body" x1="130" y1="78" x2="130" y2="130" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round" display="none"/>
+          <line id="hm-larm" x1="130" y1="95" x2="105" y2="115" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round" display="none"/>
+          <line id="hm-rarm" x1="130" y1="95" x2="155" y2="115" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round" display="none"/>
+          <line id="hm-lleg" x1="130" y1="130" x2="108" y2="160" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round" display="none"/>
+          <line id="hm-rleg" x1="130" y1="130" x2="152" y2="160" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round" display="none"/>
+        </svg>
+      </div>
+
+      <div class="word-display" id="word-display"></div>
+
+      <div class="hint-bar" id="hint-bar">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="hint-text">–</span>
+      </div>
+
+      <div class="lives-row">
+        <span class="lives-label">Lives</span>
+        <div id="lives-icons"></div>
+        <span style="font-size:13px;color:var(--ink3);margin-left:6px" id="lives-count">6</span>
+      </div>
+
+      <div class="action-row">
+        <button class="btn-primary" id="new-game-btn" disabled>New Game</button>
+        <button class="btn-outline" id="hint-btn" disabled>💡 Hint (10 coins)</button>
+      </div>
+
+      <div class="toast" id="game-msg" style="margin-top:20px"></div>
     </div>
 
-    <script>
-        let currentPlayer = null;
-        let currentGame = null;
-        let alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        const API_BASE = 'http://localhost:5000/api';
-        
-        const tabs = document.querySelectorAll('.tab');
-        const tabContents = document.querySelectorAll('.tab-content');
-        
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const tabId = tab.getAttribute('data-tab');
-                tabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                tabContents.forEach(content => content.classList.remove('active'));
-                document.getElementById(`${tabId}-tab`).classList.add('active');
-                if (tabId === 'leaderboard') loadLeaderboard();
-            });
-        });
-        
-        document.getElementById('login-btn').addEventListener('click', async () => {
-            const username = document.getElementById('login-username').value;
-            const password = document.getElementById('login-password').value;
-            const messageEl = document.getElementById('login-message');
-            
-            try {
-                const response = await fetch(`${API_BASE}/login`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ username, password })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    currentPlayer = data.user;
-                    showMessage(messageEl, 'Login successful!', 'success');
-                    document.querySelector('.tab[data-tab="game"]').click();
-                    updatePlayerStats();
-                    document.getElementById('new-game-btn').disabled = false;
-                } else {
-                    showMessage(messageEl, data.error, 'error');
-                }
-            } catch (error) {
-                showMessage(messageEl, 'Login failed. Please try again.', 'error');
-            }
-        });
-        
-        document.getElementById('register-btn').addEventListener('click', async () => {
-            const username = document.getElementById('register-username').value;
-            const email = document.getElementById('register-email').value;
-            const password = document.getElementById('register-password').value;
-            const messageEl = document.getElementById('register-message');
-            
-            try {
-                const response = await fetch(`${API_BASE}/register`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ username, email, password })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    showMessage(messageEl, 'Registration successful! Please login.', 'success');
-                    document.getElementById('register-username').value = '';
-                    document.getElementById('register-email').value = '';
-                    document.getElementById('register-password').value = '';
-                    document.querySelector('.tab[data-tab="login"]').click();
-                } else {
-                    showMessage(messageEl, data.error, 'error');
-                }
-            } catch (error) {
-                showMessage(messageEl, 'Registration failed. Please try again.', 'error');
-            }
-        });
-        
-        document.getElementById('new-game-btn').addEventListener('click', async () => {
-            if (!currentPlayer) {
-                showGameMessage('Please login first', 'error');
-                return;
-            }
-            
-            try {
-                const response = await fetch(`${API_BASE}/start-game`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ player_id: currentPlayer.player_id })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    currentGame = {
-                        game_id: data.game_id,
-                        mask: data.mask,
-                        hint: data.hint,
-                        remaining_lives: data.remaining_lives
-                    };
-                    
-                    document.getElementById('word-display').textContent = data.mask.split('').join(' ');
-                    document.getElementById('hint-text').textContent = data.hint;
-                    document.getElementById('remaining-lives').textContent = data.remaining_lives;
-                    
-                    resetHangman();
-                    generateLetterButtons();
-                    document.getElementById('hint-btn').disabled = currentPlayer.wallet_balance < 10;
-                    showGameMessage('New game started! Guess a letter.', 'info');
-                } else {
-                    showGameMessage(data.error, 'error');
-                }
-            } catch (error) {
-                showGameMessage('Failed to start game. Please try again.', 'error');
-            }
-        });
-        
-        document.getElementById('hint-btn').addEventListener('click', async () => {
-            if (!currentPlayer || !currentGame) return;
-            
-            try {
-                const response = await fetch(`${API_BASE}/get-hint`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ 
-                        game_id: currentGame.game_id,
-                        player_id: currentPlayer.player_id
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    currentGame.mask = data.new_mask;
-                    document.getElementById('word-display').textContent = data.new_mask.split('').join(' ');
-                    await updatePlayerStats();
-                    document.getElementById('hint-btn').disabled = currentPlayer.wallet_balance < 10;
-                    showGameMessage(`Hint used! Letter "${data.revealed_letter}" revealed.`, 'success');
-                } else {
-                    showGameMessage(data.error, 'error');
-                }
-            } catch (error) {
-                showGameMessage('Failed to get hint. Please try again.', 'error');
-            }
-        });
-        
-        document.getElementById('refresh-leaderboard').addEventListener('click', loadLeaderboard);
-        
-        function showMessage(element, message, type) {
-            element.textContent = message;
-            element.className = `message ${type}`;
-            element.style.display = 'block';
-        }
-        
-        function showGameMessage(message, type) {
-            showMessage(document.getElementById('game-message'), message, type);
-        }
-        
-        function updatePlayerStats() {
-            if (currentPlayer) {
-                document.getElementById('player-stats').style.display = 'block';
-                document.getElementById('stats-username').textContent = currentPlayer.username;
-                document.getElementById('stats-games-played').textContent = currentPlayer.games_played;
-                document.getElementById('stats-games-won').textContent = currentPlayer.games_won;
-                document.getElementById('stats-coins').textContent = currentPlayer.wallet_balance;
-            }
-        }
-        
-        function generateLetterButtons() {
-            const container = document.getElementById('letter-buttons');
-            container.innerHTML = '';
-            
-            for (let letter of alphabet) {
-                const button = document.createElement('button');
-                button.className = 'letter-btn';
-                button.textContent = letter;
-                button.addEventListener('click', () => makeGuess(letter));
-                container.appendChild(button);
-            }
-        }
-        
-        async function makeGuess(letter) {
-            if (!currentGame) return;
-            
-            try {
-                const response = await fetch(`${API_BASE}/make-guess`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ 
-                        game_id: currentGame.game_id,
-                        letter: letter
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    currentGame.mask = data.new_mask;
-                    currentGame.remaining_lives = data.remaining_lives;
-                    
-                    document.getElementById('word-display').textContent = data.new_mask.split('').join(' ');
-                    document.getElementById('remaining-lives').textContent = data.remaining_lives;
-                    
-                    const buttons = document.querySelectorAll('.letter-btn');
-                    buttons.forEach(btn => {
-                        if (btn.textContent === letter) {
-                            btn.disabled = true;
-                            btn.style.background = data.is_correct ? '#2ecc71' : '#e74c3c';
-                        }
-                    });
-                    
-                    if (!data.is_correct) {
-                        updateHangman(6 - data.remaining_lives);
-                    }
-                    
-                    if (data.game_won) {
-                        showGameMessage('Congratulations! You won! +20 coins', 'success');
-                        disableAllLetterButtons();
-                        document.getElementById('hint-btn').disabled = true;
-                        await updatePlayerStats();
-                    } else if (data.game_lost) {
-                        showGameMessage('Game over! You lost.', 'error');
-                        disableAllLetterButtons();
-                        document.getElementById('hint-btn').disabled = true;
-                        await updatePlayerStats();
-                    } else {
-                        showGameMessage(data.is_correct ? 'Correct guess!' : 'Incorrect guess!', 
-                                       data.is_correct ? 'success' : 'error');
-                    }
-                } else {
-                    showGameMessage(data.error, 'error');
-                }
-            } catch (error) {
-                showGameMessage('Failed to make guess. Please try again.', 'error');
-            }
-        }
-        
-        function disableAllLetterButtons() {
-            const buttons = document.querySelectorAll('.letter-btn');
-            buttons.forEach(btn => btn.disabled = true);
-        }
-        
-        function resetHangman() {
-            const parts = document.querySelectorAll('.hangman-part');
-            parts.forEach(part => {
-                if (part.classList.contains('gallows') || 
-                    part.classList.contains('pole') || 
-                    part.classList.contains('base')) {
-                    part.style.display = 'block';
-                } else {
-                    part.style.display = 'none';
-                }
-            });
-        }
-        
-        function updateHangman(wrongGuesses) {
-            const parts = ['head', 'body', 'left-arm', 'right-arm', 'left-leg', 'right-leg'];
-            for (let i = 0; i < wrongGuesses; i++) {
-                if (i < parts.length) {
-                    document.querySelector(`.${parts[i]}`).style.display = 'block';
-                }
-            }
-        }
-        
-        async function loadLeaderboard() {
-            try {
-                const response = await fetch(`${API_BASE}/leaderboard`);
-                const data = await response.json();
-                
-                if (response.ok) {
-                    const tbody = document.getElementById('leaderboard-body');
-                    tbody.innerHTML = '';
-                    
-                    data.leaderboard.forEach((player, index) => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${index + 1}</td>
-                            <td>${player.username}</td>
-                            <td>${player.games_played}</td>
-                            <td>${player.games_won}</td>
-                            <td>${player.wallet_balance}</td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                }
-            } catch (error) {
-                console.error('Leaderboard loading error:', error);
-            }
-        }
-        
-        generateLetterButtons();
-        loadLeaderboard();
-    </script>
+    <div>
+      <p class="kb-label">Select a letter</p>
+      <div class="keyboard" id="keyboard"></div>
+    </div>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="panel" id="leaderboard-panel">
+  <p class="panel-title">Hall of Fame</p>
+  <p class="panel-sub">The finest word-guessers in the realm.</p>
+  <div class="divider"><span class="divider-text">Top Players</span></div>
+  <table class="lb-table">
+    <thead>
+      <tr>
+        <th>Rank</th><th>Player</th><th>Played</th><th>Won</th><th>Coins</th>
+      </tr>
+    </thead>
+    <tbody id="lb-body"></tbody>
+  </table>
+  <div style="margin-top:28px">
+    <button class="btn-outline" id="refresh-lb">↻ Refresh</button>
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:5000/api';
+  let player = null, game = null;
+  const hmParts = ['hm-head','hm-body','hm-larm','hm-rarm','hm-lleg','hm-rleg'];
+
+  function tab(id) {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelector(`.nav-tab[data-tab="${id}"]`).classList.add('active');
+    document.getElementById(`${id}-panel`).classList.add('active');
+    if (id === 'leaderboard') loadLB();
+  }
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    t.addEventListener('click', () => tab(t.dataset.tab));
+  });
+
+  function toast(elId, msg, type) {
+    const el = document.getElementById(elId);
+    el.textContent = msg;
+    el.className = `toast ${type} show`;
+  }
+
+  function updateStats() {
+    if (!player) return;
+    document.getElementById('player-card').classList.add('visible');
+    document.getElementById('s-username').textContent = player.username;
+    document.getElementById('s-played').textContent = player.games_played;
+    document.getElementById('s-won').textContent = player.games_won;
+    document.getElementById('s-coins').textContent = player.wallet_balance;
+  }
+
+  function renderLives(remaining) {
+    document.getElementById('lives-count').textContent = remaining;
+    const c = document.getElementById('lives-icons');
+    c.innerHTML = '';
+    for (let i = 0; i < 6; i++) {
+      const h = document.createElement('span');
+      h.style.cssText = `font-size:17px;margin-right:2px;color:${i < remaining ? 'var(--rose)' : 'var(--ink3)'}`;
+      h.textContent = i < remaining ? '♥' : '♡';
+      c.appendChild(h);
+    }
+  }
+
+  function buildWord(mask) {
+    const c = document.getElementById('word-display');
+    c.innerHTML = '';
+    for (const ch of mask) {
+      if (ch === ' ') {
+        const sp = document.createElement('div');
+        sp.className = 'letter-space';
+        c.appendChild(sp);
+      } else {
+        const slot = document.createElement('div');
+        slot.className = 'letter-slot';
+        slot.textContent = ch === '_' ? '' : ch;
+        c.appendChild(slot);
+      }
+    }
+  }
+
+  function resetHangman() {
+    hmParts.forEach(id => document.getElementById(id).setAttribute('display', 'none'));
+  }
+  function showHangman(wrong) {
+    for (let i = 0; i < wrong && i < 6; i++) {
+      document.getElementById(hmParts[i]).setAttribute('display', 'block');
+    }
+  }
+
+  function buildKeyboard() {
+    const kb = document.getElementById('keyboard');
+    kb.innerHTML = '';
+    for (const letter of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+      const btn = document.createElement('button');
+      btn.className = 'key-btn';
+      btn.textContent = letter;
+      btn.dataset.letter = letter;
+      btn.addEventListener('click', () => guess(letter));
+      kb.appendChild(btn);
+    }
+  }
+
+  async function api(path, body) {
+    const opts = body
+      ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+      : { method: 'GET' };
+    const r = await fetch(API + path, opts);
+    const d = await r.json();
+    return { ok: r.ok, data: d };
+  }
+
+  document.getElementById('login-btn').addEventListener('click', async () => {
+    const { ok, data } = await api('/login', {
+      username: document.getElementById('login-username').value,
+      password: document.getElementById('login-password').value
+    });
+    if (ok) {
+      player = data.user;
+      toast('login-msg', `Welcome back, ${player.username}!`, 'success');
+      setTimeout(() => { tab('game'); updateStats(); document.getElementById('new-game-btn').disabled = false; }, 600);
+    } else {
+      toast('login-msg', data.error || 'Login failed', 'error');
+    }
+  });
+
+  document.getElementById('register-btn').addEventListener('click', async () => {
+    const { ok, data } = await api('/register', {
+      username: document.getElementById('reg-username').value,
+      email: document.getElementById('reg-email').value,
+      password: document.getElementById('reg-password').value
+    });
+    if (ok) {
+      toast('register-msg', 'Account created! Please sign in.', 'success');
+      ['reg-username', 'reg-email', 'reg-password'].forEach(id => document.getElementById(id).value = '');
+      setTimeout(() => tab('login'), 900);
+    } else {
+      toast('register-msg', data.error || 'Registration failed', 'error');
+    }
+  });
+
+  document.getElementById('new-game-btn').addEventListener('click', async () => {
+    if (!player) return;
+    const { ok, data } = await api('/start-game', { player_id: player.player_id });
+    if (ok) {
+      game = { id: data.game_id, mask: data.mask, lives: data.remaining_lives };
+      buildWord(data.mask);
+      document.getElementById('hint-bar').classList.add('visible');
+      document.getElementById('hint-text').textContent = data.hint;
+      resetHangman();
+      renderLives(data.remaining_lives);
+      buildKeyboard();
+      document.getElementById('hint-btn').disabled = (player.wallet_balance || 0) < 10;
+      toast('game-msg', 'Good luck! Guess your first letter.', 'info');
+    } else {
+      toast('game-msg', data.error || 'Failed to start game', 'error');
+    }
+  });
+
+  document.getElementById('hint-btn').addEventListener('click', async () => {
+    if (!player || !game) return;
+    const { ok, data } = await api('/get-hint', { game_id: game.id, player_id: player.player_id });
+    if (ok) {
+      game.mask = data.new_mask;
+      buildWord(data.new_mask);
+      if (player) player.wallet_balance -= 10;
+      updateStats();
+      document.getElementById('hint-btn').disabled = (player.wallet_balance || 0) < 10;
+      toast('game-msg', `Letter "${data.revealed_letter}" revealed!`, 'success');
+    } else {
+      toast('game-msg', data.error || 'Failed to get hint', 'error');
+    }
+  });
+
+  async function guess(letter) {
+    if (!game) return;
+    const { ok, data } = await api('/make-guess', { game_id: game.id, letter });
+    if (!ok) { toast('game-msg', data.error || 'Error', 'error'); return; }
+
+    game.mask = data.new_mask;
+    game.lives = data.remaining_lives;
+    buildWord(data.new_mask);
+    renderLives(data.remaining_lives);
+    showHangman(6 - data.remaining_lives);
+
+    const btn = document.querySelector(`.key-btn[data-letter="${letter}"]`);
+    if (btn) { btn.disabled = true; btn.classList.add(data.is_correct ? 'correct' : 'wrong'); }
+
+    if (data.game_won) {
+      toast('game-msg', '🎉 Magnificent! You won! +20 coins', 'success');
+      document.querySelectorAll('.key-btn').forEach(b => b.disabled = true);
+      document.getElementById('hint-btn').disabled = true;
+      if (player) { player.games_played++; player.games_won++; player.wallet_balance += 20; updateStats(); }
+    } else if (data.game_lost) {
+      toast('game-msg', 'Game over. Better luck next time.', 'error');
+      document.querySelectorAll('.key-btn').forEach(b => b.disabled = true);
+      document.getElementById('hint-btn').disabled = true;
+      if (player) { player.games_played++; updateStats(); }
+    } else {
+      toast('game-msg', data.is_correct ? '✓ Correct!' : '✗ Not in the word.', data.is_correct ? 'success' : 'error');
+    }
+  }
+
+  async function loadLB() {
+    const { ok, data } = await api('/leaderboard');
+    if (!ok) return;
+    const tbody = document.getElementById('lb-body');
+    tbody.innerHTML = '';
+    (data.leaderboard || []).forEach((p, i) => {
+      const cls = i === 0 ? 'gold-rank' : i === 1 ? 'silver-rank' : i === 2 ? 'bronze-rank' : '';
+      tbody.innerHTML += `<tr>
+        <td><span class="rank ${cls}">${i + 1}</span></td>
+        <td style="font-weight:500">${p.username}</td>
+        <td style="color:var(--ink3)">${p.games_played}</td>
+        <td style="color:var(--ink3)">${p.games_won}</td>
+        <td class="coins-cell">${p.wallet_balance}</td>
+      </tr>`;
+    });
+  }
+
+  document.getElementById('refresh-lb').addEventListener('click', loadLB);
+
+  buildKeyboard();
+  renderLives(6);
+  loadLB();
+</script>
 </body>
 </html>
