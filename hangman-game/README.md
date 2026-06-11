@@ -1,6 +1,6 @@
-# Hangman Game
+# Hanggman Game
 
-A full-stack Hangman game built with a Python Flask backend, MySQL database, and a clean HTML/CSS frontend.
+A full-stack Hanggman game built with a Python Flask backend, MySQL database, and a clean HTML/CSS frontend.
 
 ## Project structure
 
@@ -78,7 +78,7 @@ Create a `.env` file in the `backend` folder:
 ```env
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=mithesh
+DB_PASSWORD=your_password
 DB_NAME=hangman_game
 ```
 
