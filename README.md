@@ -1,79 +1,249 @@
-# Hanggman Game
+# 🎮 Hangman Game Platform
 
-A full-stack Hanggman game built with a Python Flask backend, MySQL database, and a clean HTML/CSS frontend.
+A **full-stack Hangman web application** built using **Python, Flask, MySQL, HTML5, CSS3, and JavaScript**. The application follows a client-server architecture where a responsive frontend communicates with a Flask backend through RESTful APIs to deliver an interactive word-guessing experience.
 
-## Project structure
+The project includes secure user authentication, persistent game sessions, dynamic gameplay, a coin-based hint system, player statistics, and a leaderboard backed by a relational MySQL database.
 
-- `backend/`
-  - `app.py` - Flask API server
-  - `requirements.txt` - Python dependencies
-  - `database/schema.sql` - MySQL schema and sample data
-- `frontend/`
-  - `index.html` - Single-page frontend UI
+---
 
-## Features
+## 📖 Overview
 
-- User registration and login
-- Start a new Hangman game with a random word
-- Letter guessing with remaining lives and mask updates
-- Player stats and leaderboard support
-- MySQL persistence for users, words, and game state
+Hangman Game Platform modernizes the classic Hangman game by combining a responsive web interface with a scalable backend architecture. Players can register, log in securely, start new games, guess letters, purchase hints using earned coins, and compete against other players on a leaderboard.
 
-## Requirements
+The frontend communicates with the backend using REST APIs, while the backend handles authentication, game logic, database operations, and player statistics.
 
-- Python 3.8+
+---
+
+# ✨ Features
+
+### 👤 User Authentication
+
+- Secure user registration
+- User login authentication
+- SHA-256 password hashing
+- Persistent player profiles
+
+### 🎯 Gameplay
+
+- Random word generation
+- Multiple word categories
+- Interactive Hangman board
+- Real-time word masking
+- Remaining lives tracking
+- Win/Loss detection
+- Dynamic game state management
+
+### 💡 Hint System
+
+- Coin-based hint purchase
+- Automatic letter reveal
+- Wallet balance updates
+- Transaction tracking
+
+### 🏆 Leaderboard
+
+- Player rankings
+- Games played
+- Games won
+- Coin balance
+- Dynamic leaderboard updates
+
+### 💾 Database Features
+
+- Persistent player data
+- Game session storage
+- Word categories
+- Game history
+- Transaction records
+
+---
+
+# 🏗️ System Architecture
+
+```
+                 Frontend
+      HTML5 • CSS3 • JavaScript
+                 │
+        Fetch API (HTTP Requests)
+                 │
+                 ▼
+          Flask REST API Server
+                 │
+      Authentication & Game Logic
+                 │
+                 ▼
+         MySQL Relational Database
+```
+
+---
+
+# 🛠️ Tech Stack
+
+## Frontend
+
+- HTML5
+- CSS3
+- JavaScript (ES6)
+- Fetch API
+
+## Backend
+
+- Python
 - Flask
 - Flask-CORS
 - PyMySQL
-- MySQL / MariaDB
+- python-dotenv
 
-## Setup
+## Database
 
-### 1. Clone the repository
+- MySQL
 
-### 2. Set up MySQL database
+## Development Tools
 
-Open your MySQL client (Command Prompt or MySQL Workbench) and run:
+- Git
+- GitHub
+- VS Code
+
+---
+
+# 📂 Project Structure
+
+```
+hangman-game/
+│
+├── backend/
+│   ├── app.py
+│   ├── requirements.txt
+│   ├── .env.example
+│   └── database/
+│       └── schema.sql
+│
+├── frontend/
+│   └── index.html
+│
+├── .gitignore
+└── README.md
+```
+
+---
+
+# 🗄️ Database Design
+
+The application uses a normalized MySQL database to manage gameplay and player information.
+
+Main tables include:
+
+- Player
+- Category
+- Word
+- Game
+- Game_Word
+- Transaction
+
+The database stores:
+
+- Player accounts
+- Password hashes
+- Word categories
+- Random words
+- Active game sessions
+- Player statistics
+- Wallet balance
+- Hint transactions
+
+---
+
+# 🔌 REST API Endpoints
+
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| POST | `/api/register` | Register a new player |
+| POST | `/api/login` | Authenticate a player |
+| POST | `/api/start-game` | Start a new Hangman game |
+| POST | `/api/make-guess` | Submit a guessed letter |
+| POST | `/api/get-hint` | Purchase and reveal a hint |
+| GET | `/api/leaderboard` | Retrieve leaderboard |
+| GET | `/api/test` | Test API & database connection |
+
+---
+
+# ⚙️ Installation
+
+## 1. Clone Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/HANGGMAN_GAME.git
+
+cd HANGGMAN_GAME
+```
+
+---
+
+## 2. Create MySQL Database
+
+Open MySQL Workbench or Command Prompt.
+
+Run:
 
 ```sql
 SOURCE backend/database/schema.sql;
 ```
 
-This creates the `hangman_game` database with tables, sample data, and a test user.
+This creates:
 
-### 3. Create a Python virtual environment
+- Database
+- Tables
+- Categories
+- Sample words
+- Test data
 
-From the `backend` folder:
+---
 
-```powershell
+## 3. Create Virtual Environment
+
+```bash
 cd backend
+
 python -m venv venv
 ```
 
-Activate the virtual environment:
+---
 
-**Windows PowerShell:**
+## 4. Activate Virtual Environment
+
+### Windows
+
 ```powershell
 .\venv\Scripts\Activate.ps1
 ```
 
-If blocked, allow it first:
+If PowerShell blocks execution:
+
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-.\venv\Scripts\Activate.ps1
 ```
 
-### 4. Install Python dependencies
+Then activate again.
 
-```powershell
+---
+
+## 5. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+or
+
+```bash
 pip install flask flask-cors pymysql python-dotenv
 ```
 
-(Or use: `pip install -r requirements.txt`)
+---
 
-### 5. Configure database credentials
+## 6. Configure Environment Variables
 
-Create a `.env` file in the `backend` folder:
+Create a `.env` file inside the backend folder.
 
 ```env
 DB_HOST=localhost
@@ -82,58 +252,141 @@ DB_PASSWORD=your_password
 DB_NAME=hangman_game
 ```
 
-**Important:** Add `.env` to `.gitignore` (already included) so credentials are never committed to Git.
+Never commit `.env` to GitHub.
 
-### 6. Run the backend server
+---
 
-From the `backend` folder (with venv activated):
+## 7. Run Backend
 
-```powershell
+```bash
 python app.py
 ```
 
-You should see:
+Expected output:
+
 ```
 Running on http://127.0.0.1:5000
 ```
 
-### 7. Open the frontend
+---
 
-Open `frontend/index.html` in your web browser, or double-click it from your file explorer.
+## 8. Launch Frontend
 
-## Usage
+Open:
 
-- Use the `Register` tab to create a new player.
-- Use the `Login` tab to sign in.
-- Start a new game and guess letters to reveal the hidden word.
-- Check the leaderboard for top players.
+```
+frontend/index.html
+```
 
-## Notes
+or
 
-- The database schema includes sample categories, words, and a test user (username: `test`, password: `test`).
-- Passwords are hashed with SHA-256 before storing in the database.
-- The frontend communicates with the backend via the Flask API at `http://localhost:5000/api`.
-- Update `.env` or `backend/app.py` to customize database connection settings.
+Use Live Server in VS Code.
 
-## Troubleshooting
+---
 
-**"ModuleNotFoundError: No module named 'flask'"**
-- Ensure your virtual environment is activated (you should see `(venv)` in your terminal).
-- Run: `pip install -r requirements.txt`
+# 🎮 How to Play
 
-**"Access denied for user 'root'@'localhost'"**
-- Check your MySQL credentials in `.env`
-- Ensure MySQL is running
-- Verify the database user exists and has the correct password
+1. Register a new account.
+2. Log in using your credentials.
+3. Start a new game.
+4. Guess letters to reveal the hidden word.
+5. Use hints by spending coins.
+6. Complete the word before running out of lives.
+7. Earn coins for winning games.
+8. Compete on the leaderboard.
 
-**"CORS error in browser console"**
-- Make sure the Flask backend is running (`python app.py`)
-- Check that the frontend is accessing `http://localhost:5000/api`
+---
 
-**Port 5000 already in use**
-- Another application is using port 5000, or Flask is already running
-- Kill the process or change the port in `app.py`
+# 🔒 Security Features
 
-## License
+- SHA-256 password hashing
+- Environment-based database configuration
+- Server-side validation
+- REST API architecture
+- Persistent database storage
 
-This project is free to use and modify.
+---
+
+# 💡 Software Engineering Concepts
+
+- Full-Stack Web Development
+- Client–Server Architecture
+- RESTful API Design
+- Authentication
+- CRUD Operations
+- Relational Database Design
+- Game State Management
+- JSON Data Exchange
+- Responsive Web Design
+- Modular Backend Development
+
+---
+
+# 🚀 Future Improvements
+
+- JWT Authentication
+- Email Verification
+- Multiplayer Mode
+- Difficulty Levels
+- Admin Dashboard
+- Player Profiles
+- Achievement System
+- Sound Effects
+- Dark Mode
+- Docker Deployment
+- Cloud Database Support
+
+---
+
+# 🐞 Troubleshooting
+
+## ModuleNotFoundError
+
+```bash
+pip install -r requirements.txt
+```
+
+Ensure the virtual environment is activated.
+
+---
+
+## Database Connection Failed
+
+- Verify MySQL is running.
+- Check credentials inside `.env`.
+- Confirm the `hangman_game` database exists.
+
+---
+
+## CORS Error
+
+- Ensure the Flask backend is running.
+- Verify the frontend communicates with:
+
+```
+http://localhost:5000/api
+```
+
+---
+
+## Port 5000 Already in Use
+
+Stop the existing Flask process or change the port in `app.py`.
+
+---
+
+# 📄 License
+
+This project is provided for educational and learning purposes. You are free to use, modify, and extend it for personal or academic projects.
+
+---
+
+# 👨‍💻 Author
+
+**Mithesh Manas**
+
+GitHub: **https://github.com/MITHESHMANAS**
+
+---
+
+## ⭐ If you found this project useful, consider giving it a star!
